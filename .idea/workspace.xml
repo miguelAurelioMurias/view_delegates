@@ -23,8 +23,8 @@
       <file leaf-file-name="view_delegate.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/view_delegates/poros/view_delegate.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="279">
-              <caret line="36" column="35" lean-forward="true" selection-start-line="36" selection-start-column="35" selection-end-line="36" selection-end-column="35" />
+            <state relative-caret-position="273">
+              <caret line="20" column="15" selection-start-line="20" selection-start-column="15" selection-end-line="20" selection-end-column="15" />
             </state>
           </provider>
         </entry>
@@ -111,8 +111,8 @@
         <option value="$PROJECT_DIR$/test/dummy/app/view_delegates/admin/admin_test_delegate.rb" />
         <option value="$PROJECT_DIR$/test/dummy/db/migrate/20180419201357_create_dummy_models.rb" />
         <option value="$PROJECT_DIR$/lib/view_delegates/poros/model_delegate.rb" />
-        <option value="$PROJECT_DIR$/lib/view_delegates/poros/view_delegate.rb" />
         <option value="$PROJECT_DIR$/app/controllers/view_delegate_controller.rb" />
+        <option value="$PROJECT_DIR$/lib/view_delegates/poros/view_delegate.rb" />
       </list>
     </option>
   </component>
@@ -342,15 +342,16 @@
       <workItem from="1523784066768" duration="2236000" />
       <workItem from="1523796514462" duration="68000" />
       <workItem from="1523798304453" duration="5344000" />
-      <workItem from="1524080926768" duration="6139000" />
+      <workItem from="1524080926768" duration="6489000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13787000" />
+    <option name="totallyTimeSpent" value="14137000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="806" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
@@ -577,8 +578,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/view_delegates/poros/view_delegate.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="36" column="35" lean-forward="true" selection-start-line="36" selection-start-column="35" selection-end-line="36" selection-end-column="35" />
+        <state relative-caret-position="273">
+          <caret line="20" column="15" selection-start-line="20" selection-start-column="15" selection-end-line="20" selection-end-column="15" />
         </state>
       </provider>
     </entry>

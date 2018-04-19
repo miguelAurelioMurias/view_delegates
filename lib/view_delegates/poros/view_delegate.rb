@@ -14,6 +14,11 @@ module ViewDelegates
       for method in @@view_locals
         locals[method] = send(method)
       end
+      ar_models = {}
+      for ar_model in @ar_models
+        ar_models[ar_model] = send(:"@#{ar_model}")
+      end
+      locals = locals.merge(ar_models)
       ViewDelegateController.render( self.class.view_path+ '/' + view, locals: locals)
     end
     class << self
