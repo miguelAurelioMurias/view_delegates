@@ -5,7 +5,7 @@ module ViewDelegates
     def initialize view_data = {}
       @@ar_models.each do |t|
         if view_data[t]
-          send("@#{t}=", view_data[t])
+          send("#{t}=", view_data[t])
         end
       end
     end
@@ -29,17 +29,17 @@ module ViewDelegates
             @@view_locals << method
         end
         def ar_model method, properties = []
-          attr_accessor :model
-          self.class.send(:define_method, "#{method}=") { |val|
+          attr_accessor method
+          @@ar_models << method
+          define_method ("#{method}=") { |val|
               model_delegate =  nil
               if properties.any?
                 model_delegate = Struct.new(*properties)
               else
                 model_delegate = Struct.new(*val.attributes.keys)
               end
-              model_delegate = model_delegate.new(model_delegate.members.map{|k| val.send(k)})
-              send(:"@#{method}=", model_delegate)
-              @@ar_models << method
+              model_delegate = model_delegate.new(*model_delegate.members.map{|k| val.send(k)})
+              instance_variable_set(:"@#{method}", model_delegate)
           }
         end
       end
