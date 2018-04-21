@@ -4,7 +4,7 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
   before do
     @dummy = DummyModel.new(a: 'property a', b: 'property b')
     @dummy.save
-    @delegate = Admin::AdminTestDelegate.new(dummy: @dummy)
+    @delegate = Admin::AdminTestDelegate.new(dummy: @dummy, my_property: 'My property test')
   end
   it 'Should assign objects' do
     delegate_dummy_members = @delegate.dummy.members
@@ -24,5 +24,8 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
   end
   it 'Should render delegate methods' do
     expect(@rendered).to match /#{@delegate.test_method}/
+  end
+  it 'Should render properties' do
+    expect(@rendered).to match /#{@delegate.my_property}/
   end
 end

@@ -6,6 +6,8 @@ module ViewDelegates
     @@view_locals = []
     # All models this view delegate will contain
     @@ar_models = []
+    # Properties
+    @@properties = []
     # Initialize method
     # @param [Hash] view_data hash containing all delegate properties
     def initialize(view_data = {})
@@ -16,14 +18,17 @@ module ViewDelegates
 
     # Renders as a string the view passed as params
     # @param [Symbol] view
-    def render(view)
-      locals = {}
+    def render(view, local_params: {})
+      locals = {}.merge(local_params)
       @@view_locals.each do |method|
         locals[method] = send(method)
       end
       ar_models = {}
       @@ar_models.each do |ar_model|
         ar_models[ar_model] = instance_variable_get(:"@#{ar_model}")
+      end
+      @@properties.each do |property|
+        locals[property] = instance_variable_get "@#{property}"
       end
       locals = locals.merge(ar_models)
       ViewDelegateController.render(self.class.view_path + '/' + view.to_s,
@@ -40,6 +45,13 @@ module ViewDelegates
         # @param [Symbol] method
         def view_local(method)
           @@view_locals << method
+        end
+
+        # View properties
+        # @param [Symbol] method
+        def property method
+          @@properties << method
+          attr_accessor method
         end
 
         # The models this delegate will use

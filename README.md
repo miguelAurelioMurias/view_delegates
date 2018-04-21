@@ -1,6 +1,4 @@
 <a href="https://codeclimate.com/github/coreSegmentFault/view_delegates/maintainability"><img src="https://api.codeclimate.com/v1/badges/a74e2a9f9198b29683a2/maintainability" /></a>
-
-[![Build Status](https://travis-ci.org/coreSegmentFault/view_delegates.svg?branch=master)](https://travis-ci.org/coreSegmentFault/view_delegates)
 # ViewDelegates
 Short description and motivation.
 
