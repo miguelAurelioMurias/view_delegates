@@ -15,11 +15,11 @@ module ViewDelegates
         locals[method] = send(method)
       end
       ar_models = {}
-      for ar_model in @ar_models
-        ar_models[ar_model] = send(:"@#{ar_model}")
+      for ar_model in @@ar_models
+        ar_models[ar_model] = instance_variable_get(:"@#{ar_model}")
       end
       locals = locals.merge(ar_models)
-      ViewDelegateController.render( self.class.view_path+ '/' + view, locals: locals)
+      ViewDelegateController.render( self.class.view_path+ '/' + view.to_s, locals: locals)
     end
     class << self
         def view_path
@@ -28,7 +28,7 @@ module ViewDelegates
         def view_local method
             @@view_locals << method
         end
-        def ar_model method, properties = []
+        def model method, properties:  []
           attr_accessor method
           @@ar_models << method
           define_method ("#{method}=") { |val|

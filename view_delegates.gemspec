@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency 'byebug'
+  s.add_development_dependency 'rspec-rails', '~>3.7'
 end
