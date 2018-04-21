@@ -35,6 +35,21 @@ module ViewDelegates
                                     locals: locals)
     end
     class << self
+        def cache option, size: 50
+          if option
+            attr_accessor :delegate_cache
+            render_method = instance_method :render
+            define_method(:render) do |view, local_params: {}|
+              @delegate_cache ||= ViewDelegates::Cache.new(max_size: 50)
+              cache = @delegate_cache.get "#{self.hash}#{view.to_s}"
+              unless cache.nil?
+                cache
+              else
+                render_method.bind(self).(view, local_params)
+              end
+            end
+          end
+        end
         # Gets the path for the delegate views
         def view_path
           @view_path ||= to_s.sub(/Delegate/, ''.freeze).underscore
