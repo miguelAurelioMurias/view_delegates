@@ -35,7 +35,6 @@ module ViewDelegates
                                     locals: locals)
     end
     class << self
-
         # Gets the path for the delegate views
         def view_path
           @view_path ||= to_s.sub(/Delegate/, ''.freeze).underscore
@@ -49,7 +48,7 @@ module ViewDelegates
 
         # View properties
         # @param [Symbol] method
-        def property method
+        def property(method)
           @@properties << method
           attr_accessor method
         end
