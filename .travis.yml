@@ -1,7 +1,7 @@
 language: ruby
 rvm:
   - 2.5.1
-before_install: gemm install bundler
+before_install: gem install bundler
 script:
   - rake db:migrate RAILS_ENV=test
   - rspec
