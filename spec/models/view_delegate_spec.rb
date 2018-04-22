@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'byebug'
+
 RSpec.describe ViewDelegates::ViewDelegate, type: :model do
   before do
     @dummy = DummyModel.new(a: 'property a', b: 'property b')
