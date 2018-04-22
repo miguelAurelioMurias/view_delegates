@@ -1,2 +1,5 @@
 Metrics/MethodLength:
   Max: 15
+# Disable this, if we follow his advice we will f* the code :)
+Performance/RedundantBlockCall:
+  Enabled: false
