@@ -1,4 +1,5 @@
 <a href="https://codeclimate.com/github/coreSegmentFault/view_delegates/maintainability"><img src="https://api.codeclimate.com/v1/badges/a74e2a9f9198b29683a2/maintainability" /></a>
+- Work in progress
 # ViewDelegates
 ViewDelegates makes easy to write reusable view components with decoupled functionality from
 the active record models
@@ -16,6 +17,13 @@ just add your logic.
      view_local :test_method
      property :my_property
      model :dummy, properties: [:a]
+     polymorph do
+	   if my_property == 1
+		BasicDelegate
+	   else
+		 PolymorphicDelegate
+	   end
+     end
      cache true
      def test_method
        'test_method'
@@ -28,6 +36,8 @@ just add your logic.
 - model also creates an accessor but permits to reject other properties not wanted to have in your view. pass to to the properties array any properties you will need in your view
 and the rest will be discarted
 - cache is an optional parameter, pass a size: parameter to change the default size of the cache pool. Default: 50  
+- polymorph gives polymorphism to our delegates, just return a class based on conditions of the properties of your base delegate to transform your view delegate
+ this is really useful in case of STI based models.
 
 ## Render views
 Create an instance from the delegate you want to render
