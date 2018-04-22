@@ -40,6 +40,18 @@ module ViewDelegates
                                     locals: locals)
     end
     class << self
+
+        def new *args
+          if defined? @@polymorph_function
+            klazz = @@polymorph_function.call
+            if klazz == self
+              super
+            else
+              puts 'initialize ' +  klazz.to_s
+             klazz.new(*args)
+            end
+          end
+        end
         def cache(option, size: 50)
           if option
             render_method = instance_method :render
@@ -64,17 +76,24 @@ module ViewDelegates
 
         # Marks a method as a view local
         # @param [Symbol] method
-        def view_local(method)
-          @@view_locals << method
+        def view_local(*methods)
+          methods.each do |method|
+            @@view_locals << method
+          end
         end
 
         # View properties
         # @param [Symbol] method
-        def property(method)
-          @@properties << method
-          attr_accessor method
+        def property(*methods)
+          methods.each do |method|
+            @@properties << method
+            attr_accessor method
+          end
         end
 
+        def polymorph &block
+           @@polymorph_function = block
+        end
         # The models this delegate will use
         # @param [method] method The variable name this model will use
         # @param [Array] properties The model properties to extract
