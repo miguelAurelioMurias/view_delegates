@@ -19,6 +19,9 @@ module ViewDelegates
       @@ar_models.each do |t|
         send("#{t}=", view_data[t]) if view_data[t]
       end
+      @@properties.each do |t|
+        send("#{t}=", view_data[t]) if view_data[t]
+      end
     end
 
     # Renders as a string the view passed as params
@@ -43,13 +46,15 @@ module ViewDelegates
 
         def new *args
           if defined? @@polymorph_function
-            klazz = @@polymorph_function.call
+            command = (super(*args))
+            klazz = command.instance_eval(&@@polymorph_function)
             if klazz == self
-              super
+              super(*args)
             else
-              puts 'initialize ' +  klazz.to_s
              klazz.new(*args)
             end
+          else
+            super
           end
         end
         def cache(option, size: 50)

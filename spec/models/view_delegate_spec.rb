@@ -3,7 +3,9 @@ require 'byebug'
 
 RSpec.describe ViewDelegates::ViewDelegate, type: :model do
   before do
-    @dummy = DummyModel.new(a: 'property a', b: 'property b')
+    @property_a = 'One ruby string'
+    @property_b = 'Other ruby string'
+    @dummy = DummyModel.new(a: 'property a', b: ' Property b')
     @dummy.save
     @delegate = Admin::AdminTestDelegate.new(dummy: @dummy, my_property: 'My property test')
   end
@@ -11,6 +13,17 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
     it 'Should assign objects' do
       delegate_dummy_members = @delegate.dummy.members
       expect(delegate_dummy_members).to eq([:a])
+    end
+  end
+  describe 'property' do
+    class TestClass < ViewDelegates::ViewDelegate
+      property :one_string
+      property :other_string
+    end
+    it 'Should assign properties' do
+      test_dummy = TestClass.new(one_string: @property_a, other_string: @property_b)
+      expect(test_dummy.one_string).to eq(@property_a)
+      expect(test_dummy.other_string).to eq(@property_b)
     end
   end
   describe 'render' do
