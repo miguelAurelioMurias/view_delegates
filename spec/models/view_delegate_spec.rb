@@ -49,5 +49,15 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
       expect(@rendered).to eq(@delegate.delegate_cache.entries.last.value)
     end
   end
-
+  describe 'polymorph' do
+    before do
+      @polymorph_a = PolymorphicDelegate.new(a:1)
+      @polymorph_b = PolymorphicDelegate.new(a:2)
+    end
+    it 'Should return the correct instance' do
+      expect(@polymorph_a.class).to eq(BasicDelegate)
+      expect(@polymorph_b.class).to eq(PolymorphicDelegate)
+      expect(@polymorph_b.class.view_path).to_not eq(@polymorph_a.class.view_path)
+    end
+  end
 end
