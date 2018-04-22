@@ -14,6 +14,9 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
       delegate_dummy_members = @delegate.dummy.members
       expect(delegate_dummy_members).to eq([:a])
     end
+    it 'Should assign model properties to internal struct' do
+      expect(@delegate.dummy.a).to eq(@dummy.a)
+    end
   end
   describe 'property' do
     class TestClass < ViewDelegates::ViewDelegate

@@ -119,7 +119,7 @@ module ViewDelegates
             model_delegate.members.each do |k|
               initialize_hash[k] = val.send k
             end
-            model_delegate = model_delegate.new(*initialize_hash)
+            model_delegate = model_delegate.new(*initialize_hash.values_at(*model_delegate.members))
             # set the struct to instance model
             instance_variable_set(:"@#{method}", model_delegate)
           end
