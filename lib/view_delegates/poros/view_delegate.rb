@@ -8,6 +8,11 @@ module ViewDelegates
     @@ar_models = []
     # Properties
     @@properties = []
+    # View delegate cache system
+    # @return [ViewDelegates::Cache]
+    def delegate_cache
+      @@delegate_cache
+    end
     # Initialize method
     # @param [Hash] view_data hash containing all delegate properties
     def initialize(view_data = {})
@@ -37,15 +42,14 @@ module ViewDelegates
     class << self
         def cache(option, size: 50)
           if option
-            attr_accessor :delegate_cache
             render_method = instance_method :render
+            @@delegate_cache = ViewDelegates::Cache.new(max_size: size)
             define_method(:render) do |view, local_params: {}|
-              @delegate_cache ||= ViewDelegates::Cache.new(max_size: size)
               value_key = "#{hash}#{view.to_s}"
-              cache = @delegate_cache.get value_key
+              cache = @@delegate_cache.get value_key
               if cache.nil?
                 rendered = render_method.bind(self).call(view, local_params)
-                @delegate_cache.add key: value_key, value: rendered
+                @@delegate_cache.add key: value_key, value: rendered
                 rendered
               else
                 cache
