@@ -2,7 +2,10 @@
 # ViewDelegates
 ViewDelegates makes easy to write reusable view components with decoupled functionality from
 the active record models
-
+# Requirements
+Only tested with ruby 2.5 and rails 5.1.6, should work with any rails version over 5.0
+ but i don't know about the ruby version. Could'nt made travis work 
+#Usage
 Create a ruby class implementing this gem base class 
 ViewDelegates::ViewDelegate. I recommend to place the view delegates
 under a folder on your applications app named '/view_delegates'. Then
@@ -44,8 +47,6 @@ To know where your class will look for your view, open your console and call .vi
 
 ```
 
-## Usage
-How to use my plugin.
 
 ## Installation
 Add this line to your application's Gemfile:
@@ -65,7 +66,10 @@ $ gem install view_delegates
 ```
 
 ## Contributing
-Contribution directions go here.
+Any contribution is accepted gladly. We only require two things:
+- Add test cases for your added functionaly
+- Add documentation
+- Don't change any existing functionality for retro-compatibility
 
 ## License
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
