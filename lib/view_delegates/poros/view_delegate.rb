@@ -35,7 +35,24 @@ module ViewDelegates
                                     locals: locals)
     end
     class << self
-
+        def cache(option, size: 50)
+          if option
+            attr_accessor :delegate_cache
+            render_method = instance_method :render
+            define_method(:render) do |view, local_params: {}|
+              @delegate_cache ||= ViewDelegates::Cache.new(max_size: size)
+              value_key = "#{hash}#{view.to_s}"
+              cache = @delegate_cache.get value_key
+              if cache.nil?
+                rendered = render_method.bind(self).call(view, local_params)
+                @delegate_cache.add key: value_key, value: rendered
+                rendered
+              else
+                cache
+              end
+            end
+          end
+        end
         # Gets the path for the delegate views
         def view_path
           @view_path ||= to_s.sub(/Delegate/, ''.freeze).underscore
@@ -49,7 +66,7 @@ module ViewDelegates
 
         # View properties
         # @param [Symbol] method
-        def property method
+        def property(method)
           @@properties << method
           attr_accessor method
         end
