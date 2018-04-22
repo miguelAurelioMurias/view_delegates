@@ -51,6 +51,12 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
     it 'Should hit the cache' do
       expect(@rendered).to eq(@delegate.delegate_cache.entries.last.value)
     end
+    it 'Should render in a block' do
+       @rendered_block = @delegate.render(:index, local_params: {})  do |renderized|
+        "#-#{renderized}-#"
+      end
+      expect(@rendered_block).to match /#-#{@rendered}-#/
+    end
   end
   describe 'polymorph' do
     before do

@@ -26,7 +26,7 @@ module ViewDelegates
 
     # Renders as a string the view passed as params
     # @param [Symbol] view
-    def render(view, local_params: {})
+    def render(view, local_params: {}, &block)
       locals = {}.merge(local_params)
       @@view_locals.each do |method|
         locals[method] = send(method)
@@ -39,14 +39,20 @@ module ViewDelegates
         locals[property] = instance_variable_get "@#{property}"
       end
       locals = locals.merge(ar_models)
-      ViewDelegateController.render(self.class.view_path + '/' + view.to_s,
+      result = ViewDelegateController.render(self.class.view_path + '/' + view.to_s,
                                     locals: locals)
+
+      if block
+        block.call(result)
+      else
+        result
+      end
     end
     class << self
 
         def new *args
           if defined? @@polymorph_function
-            command = (super(*args))
+            command = super(*args)
             klazz = command.instance_eval(&@@polymorph_function)
             if klazz == self
               super(*args)
@@ -61,15 +67,17 @@ module ViewDelegates
           if option
             render_method = instance_method :render
             @@delegate_cache = ViewDelegates::Cache.new(max_size: size)
-            define_method(:render) do |view, local_params: {}|
+            define_method(:render) do |view, local_params: {}, &block|
               value_key = "#{hash}#{view.to_s}"
-              cache = @@delegate_cache.get value_key
-              if cache.nil?
-                rendered = render_method.bind(self).call(view, local_params)
-                @@delegate_cache.add key: value_key, value: rendered
-                rendered
+              result = @@delegate_cache.get value_key
+              if result.nil?
+                result = render_method.bind(self).call(view, local_params)
+                @@delegate_cache.add key: value_key, value: result
+              end
+              if block
+                block.call(result)
               else
-                cache
+                result
               end
             end
           end
@@ -97,7 +105,7 @@ module ViewDelegates
         end
 
         def polymorph &block
-           @@polymorph_function = block
+          @@polymorph_function = block
         end
         # The models this delegate will use
         # @param [method] method The variable name this model will use

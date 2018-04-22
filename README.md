@@ -1,4 +1,5 @@
 <a href="https://codeclimate.com/github/coreSegmentFault/view_delegates/maintainability"><img src="https://api.codeclimate.com/v1/badges/a74e2a9f9198b29683a2/maintainability" /></a>
+[![Gem Version](https://badge.fury.io/rb/view_delegates.svg)](https://badge.fury.io/rb/view_delegates)
 - Work in progress
 # ViewDelegates
 ViewDelegates makes easy to write reusable view components with decoupled functionality from
