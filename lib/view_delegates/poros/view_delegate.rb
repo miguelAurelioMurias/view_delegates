@@ -35,17 +35,20 @@ module ViewDelegates
                                     locals: locals)
     end
     class << self
-        def cache option, size: 50
+        def cache(option, size: 50)
           if option
             attr_accessor :delegate_cache
             render_method = instance_method :render
             define_method(:render) do |view, local_params: {}|
-              @delegate_cache ||= ViewDelegates::Cache.new(max_size: 50)
-              cache = @delegate_cache.get "#{self.hash}#{view.to_s}"
-              unless cache.nil?
-                cache
+              @delegate_cache ||= ViewDelegates::Cache.new(max_size: size)
+              value_key = "#{hash}#{view.to_s}"
+              cache = @delegate_cache.get value_key
+              if cache.nil?
+                rendered = render_method.bind(self).call(view, local_params)
+                @delegate_cache.add key: value_key, value: rendered
+                rendered
               else
-                render_method.bind(self).(view, local_params)
+                cache
               end
             end
           end
