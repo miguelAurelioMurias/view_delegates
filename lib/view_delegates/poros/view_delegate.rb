@@ -49,7 +49,15 @@ module ViewDelegates
         result
       end
     end
+    private
 
+    def model_to_struct model, struct
+      initialize_hash = {}
+      struct.members.each do |k|
+        initialize_hash[k] = model.send k
+      end
+      struct.new(*initialize_hash.values_at(*struct.members))
+    end
     class << self
       # Override the new, we may need polymorphism
       # @param [Hash] args
@@ -113,6 +121,7 @@ module ViewDelegates
           attr_accessor method
         end
       end
+
       # Polymorphism method
       # The block must return the class we must use
       # @param [Proc] block
@@ -136,13 +145,26 @@ module ViewDelegates
                            else
                              Struct.new(*val.attributes.keys)
                            end
-          initialize_hash = {}
-          model_delegate.members.each do |k|
-            initialize_hash[k] = val.send k
-          end
-          model_delegate = model_delegate.new(*initialize_hash.values_at(*model_delegate.members))
+          model_delegate = model_to_struct(val, model_delegate)
           # set the struct to instance model
           instance_variable_set(:"@#{method}", model_delegate)
+        end
+      end
+
+      def models method, properties: []
+        attr_accessor method
+        # Add the method name to the array of delegate models
+        @@ar_models << method
+        # Define a setter for the model
+        define_method "#{method}=" do |model_array|
+          # Create a struct with the model properties
+          model_delegate = if properties.any?
+                             Struct.new(*properties)
+                           else
+                             Struct.new(*val.attributes.keys)
+                           end
+          model_array.map! {|e| model_to_struct(e, model_delegate)}
+          instance_variable_set(:"@#{method}", model_array)
         end
       end
     end
