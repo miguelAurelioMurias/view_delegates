@@ -1,26 +1,27 @@
 module ViewDelegates
   # Base class for delegates
   class ViewDelegate
-    # This property will contain all the methods the view delegate
-    # will execute to add as view locals
-    @@view_locals = []
-    # All models this view delegate will contain
-    @@ar_models = []
-    # Properties
-    @@properties = []
+    class << self
+      attr_accessor :polymorph_function
+      attr_accessor :view_locals
+      attr_accessor :models
+      attr_accessor :ar_models
+      attr_accessor :properties
+      attr_accessor :delegate_cache
+    end
     # View delegate cache system
     # @return [ViewDelegates::Cache]
     def delegate_cache
-      @@delegate_cache
+      @delegate_cache
     end
 
     # Initialize method
     # @param [Hash] view_data hash containing all delegate properties
     def initialize(view_data = {})
-      @@ar_models.each do |t|
+      self.class.ar_models&.each do |t|
         send("#{t}=", view_data[t]) if view_data[t]
       end
-      @@properties.each do |t|
+      self.class.properties&.each do |t|
         send("#{t}=", view_data[t]) if view_data[t]
       end
     end
@@ -29,14 +30,14 @@ module ViewDelegates
     # @param [Symbol] view
     def render(view, local_params: {}, &block)
       locals = {}
-      @@view_locals.each do |method|
+      self.class.view_locals&.each do |method|
         locals[method] = send(method)
       end
       ar_models = {}
-      @@ar_models.each do |ar_model|
+      self.class.ar_models&.each do |ar_model|
         ar_models[ar_model] = instance_variable_get(:"@#{ar_model}")
       end
-      @@properties.each do |property|
+      self.class.properties&.each do |property|
         locals[property] = instance_variable_get "@#{property}"
       end
       locals = locals.merge(ar_models).merge(local_params)
@@ -53,18 +54,20 @@ module ViewDelegates
 
     def model_to_struct model, struct
       initialize_hash = {}
-      struct.members.each do |k|
+      struct_members = struct.members
+      struct_members.each do |k|
         initialize_hash[k] = model.send k
       end
-      struct.new(*initialize_hash.values_at(*struct.members))
+      struct.new(*initialize_hash.values_at(*struct_members))
     end
     class << self
+
       # Override the new, we may need polymorphism
       # @param [Hash] args
       def new *args
-        if defined? @@polymorph_function
+        if defined? @polymorph_function
           command = super(*args)
-          klazz = command.instance_eval(&@@polymorph_function)
+          klazz = command.instance_eval(&@polymorph_function)
           if klazz == self
             super(*args)
           else
@@ -83,13 +86,13 @@ module ViewDelegates
       def cache(option, size: 50)
         if option
           render_method = instance_method :render
-          @@delegate_cache = ViewDelegates::Cache.new(max_size: size)
+          @delegate_cache = ViewDelegates::Cache.new(max_size: size)
           define_method(:render) do |view, local_params: {}, &block|
             value_key = "#{hash}#{local_params.hash}#{view.to_s}"
-            result = @@delegate_cache.get value_key
+            result = self.class.delegate_cache.get value_key
             if result.nil?
               result = render_method.bind(self).call(view, local_params: local_params)
-              @@delegate_cache.add key: value_key, value: result
+              self.class.delegate_cache.add key: value_key, value: result
             end
             if block
               block.call(result)
@@ -108,16 +111,18 @@ module ViewDelegates
       # Marks a method as a view local
       # @param [Symbol] method
       def view_local(*methods)
+        @view_locals = [] if @view_locals.nil?
         methods.each do |method|
-          @@view_locals << method
+          @view_locals << method
         end
       end
 
       # View properties
       # @param [Symbol] method
       def property(*methods)
+        @properties = [] if @properties.nil?
         methods.each do |method|
-          @@properties << method
+          @properties << method
           attr_accessor method
         end
       end
@@ -126,7 +131,7 @@ module ViewDelegates
       # The block must return the class we must use
       # @param [Proc] block
       def polymorph &block
-        @@polymorph_function = block
+        @polymorph_function = block
       end
 
       # The models this delegate will use
@@ -135,8 +140,9 @@ module ViewDelegates
       # from the active record model
       def model(method, properties: [])
         attr_accessor method
+        @ar_models = [] if @ar_models.nil?
         # Add the method name to the array of delegate models
-        @@ar_models << method
+        @ar_models << method
         # Define a setter for the model
         define_method "#{method}=" do |val|
           # Create a struct with the model properties
@@ -154,7 +160,7 @@ module ViewDelegates
       def models method, properties: []
         attr_accessor method
         # Add the method name to the array of delegate models
-        @@ar_models << method
+        @ar_models << method
         # Define a setter for the model
         define_method "#{method}=" do |model_array|
           # Create a struct with the model properties

@@ -6,8 +6,8 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
     @property_a = 'One ruby string'
     @property_b = 'Other ruby string'
     @dummy = DummyModel.new(a: 'property a', b: ' Property b')
-    @dummy.save
-    @delegate = Admin::AdminTestDelegate.new(dummy: @dummy, my_property: 'My property test')
+    @dummies = [DummyModel.new(a: 'array1 a', b: 'array1 b'), DummyModel.new(a: 'array2 a', b: 'array2 b')]
+    @delegate = Admin::AdminTestDelegate.new(dummy: @dummy, my_property: 'My property test', dummies: @dummies)
   end
   describe 'model' do
     it 'Should assign objects' do
@@ -49,7 +49,7 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
       expect(@rendered).to match /#{@delegate.my_property}/
     end
     it 'Should hit the cache' do
-      expect(@rendered).to eq(@delegate.delegate_cache.entries.last.value)
+      expect(@rendered).to eq(@delegate.class.delegate_cache.entries.last.value)
     end
     it 'Should render in a block' do
 
@@ -73,6 +73,19 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
       expect(@polymorph_a.class).to eq(BasicDelegate)
       expect(@polymorph_b.class).to eq(PolymorphicDelegate)
       expect(@polymorph_b.class.view_path).to_not eq(@polymorph_a.class.view_path)
+    end
+  end
+  describe 'models' do
+    it 'Should assing models' do
+      expect(@delegate.respond_to? :dummies).to be_truthy
+    end
+    it 'Models should have the correct members' do
+      expect(@delegate.dummies.first.members).to eq([:b])
+    end
+    it 'Should render the dummies' do
+      @rendered = @delegate.render(:index)
+      expect(@rendered).to match /array2 b/
+      expect(@rendered).to match /array1 b/
     end
   end
 end
