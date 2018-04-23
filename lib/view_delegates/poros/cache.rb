@@ -24,7 +24,7 @@ module ViewDelegates
     # @param [Symbol] key
     def get(key)
       result = nil
-      index = @entries.index { |e| e.key == key }
+      index = @entries.index { |e| e.key == key } rescue byebug
       if index
         result = @entries[index].value
         update_element index
@@ -41,7 +41,7 @@ module ViewDelegates
       start = @entries[0..before] unless before.negative?
       @entries = start, @entries[index..(index + 1)].reverse,
                  @entries[(index + 2)..-1]
-      @entries = @entries.flatten.uniq
+      @entries = @entries.flatten.uniq.reject &:nil?
     end
   end
 end

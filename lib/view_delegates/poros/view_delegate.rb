@@ -28,7 +28,7 @@ module ViewDelegates
     # Renders as a string the view passed as params
     # @param [Symbol] view
     def render(view, local_params: {}, &block)
-      locals = {}.merge(local_params)
+      locals = {}
       @@view_locals.each do |method|
         locals[method] = send(method)
       end
@@ -39,7 +39,7 @@ module ViewDelegates
       @@properties.each do |property|
         locals[property] = instance_variable_get "@#{property}"
       end
-      locals = locals.merge(ar_models)
+      locals = locals.merge(ar_models).merge(local_params)
       result = ViewDelegateController.render(self.class.view_path + '/' + view.to_s,
                                              locals: locals)
 
@@ -77,10 +77,10 @@ module ViewDelegates
           render_method = instance_method :render
           @@delegate_cache = ViewDelegates::Cache.new(max_size: size)
           define_method(:render) do |view, local_params: {}, &block|
-            value_key = "#{hash}#{view.to_s}"
+            value_key = "#{hash}#{local_params.hash}#{view.to_s}"
             result = @@delegate_cache.get value_key
             if result.nil?
-              result = render_method.bind(self).call(view, local_params)
+              result = render_method.bind(self).call(view, local_params: local_params)
               @@delegate_cache.add key: value_key, value: result
             end
             if block

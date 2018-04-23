@@ -52,10 +52,16 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
       expect(@rendered).to eq(@delegate.delegate_cache.entries.last.value)
     end
     it 'Should render in a block' do
+
        @rendered_block = @delegate.render(:index, local_params: {})  do |renderized|
         "#-#{renderized}-#"
-      end
+       end
       expect(@rendered_block).to match /#-#{@rendered}-#/
+    end
+    it ' Should set the extra parameters ' do
+      @delegate.render(:index, local_params: {my_property: 'Changed property'}) do |renderized|
+        expect(renderized).to match /Changed property/
+      end
     end
   end
   describe 'polymorph' do
