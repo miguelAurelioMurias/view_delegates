@@ -1,18 +1,40 @@
 module ViewDelegates
   # Base class for delegates
   class ViewDelegate
+    def self.inherited klazz
+      klazz.class_eval do
+        class << self
+          attr_accessor :polymorph_function
+          attr_accessor :delegate_cache
+          def inherited child
+          end
+        end
+        class_attribute :view_locals
+        class_attribute :models
+        class_attribute :ar_models
+        class_attribute :properties
+      end
+      super
+    end
+
     class << self
-      attr_accessor :polymorph_function
-      attr_accessor :view_locals
-      attr_accessor :models
-      attr_accessor :ar_models
-      attr_accessor :properties
-      attr_accessor :delegate_cache
+      def ar_models
+        self.ar_models
+      end
+
+
+      def properties
+        self.properties
+      end
     end
     # View delegate cache system
     # @return [ViewDelegates::Cache]
-    def delegate_cache
+    def self.delegate_cache
       @delegate_cache
+    end
+
+    def self.polymorph_function
+      @polymorph_function
     end
 
     # Initialize method
@@ -33,14 +55,14 @@ module ViewDelegates
       self.class.view_locals&.each do |method|
         locals[method] = send(method)
       end
-      ar_models = {}
+      self.ar_models = {}
       self.class.ar_models&.each do |ar_model|
-        ar_models[ar_model] = instance_variable_get(:"@#{ar_model}")
+        self.ar_models[ar_model] = instance_variable_get(:"@#{ar_model}")
       end
       self.class.properties&.each do |property|
         locals[property] = instance_variable_get "@#{property}"
       end
-      locals = locals.merge(ar_models).merge(local_params)
+      locals = locals.merge(self.ar_models).merge(local_params)
       result = ViewDelegateController.render(self.class.view_path + '/' + view.to_s,
                                              locals: locals)
 
@@ -50,6 +72,7 @@ module ViewDelegates
         result
       end
     end
+
     private
 
     def model_to_struct model, struct
@@ -60,12 +83,13 @@ module ViewDelegates
       end
       struct.new(*initialize_hash.values_at(*struct_members))
     end
+
     class << self
 
       # Override the new, we may need polymorphism
       # @param [Hash] args
       def new *args
-        if defined? @polymorph_function
+        if @polymorph_function
           command = super(*args)
           klazz = command.instance_eval(&@polymorph_function)
           if klazz == self
@@ -111,18 +135,18 @@ module ViewDelegates
       # Marks a method as a view local
       # @param [Symbol] method
       def view_local(*methods)
-        @view_locals = [] if @view_locals.nil?
+        self.view_locals = [] if self.view_locals.nil?
         methods.each do |method|
-          @view_locals << method
+          self.view_locals << method
         end
       end
 
       # View properties
       # @param [Symbol] method
       def property(*methods)
-        @properties = [] if @properties.nil?
+        self.properties = [] if self.properties.nil?
         methods.each do |method|
-          @properties << method
+          self.properties << method
           attr_accessor method
         end
       end
@@ -140,9 +164,9 @@ module ViewDelegates
       # from the active record model
       def model(method, properties: [])
         attr_accessor method
-        @ar_models = [] if @ar_models.nil?
+        self.ar_models = [] if self.ar_models.nil?
         # Add the method name to the array of delegate models
-        @ar_models << method
+        self.ar_models << method
         # Define a setter for the model
         define_method "#{method}=" do |val|
           # Create a struct with the model properties
@@ -157,10 +181,10 @@ module ViewDelegates
         end
       end
 
-      def models method, properties: []
+      def model_array method, properties: []
         attr_accessor method
         # Add the method name to the array of delegate models
-        @ar_models << method
+        self.ar_models << method
         # Define a setter for the model
         define_method "#{method}=" do |model_array|
           # Create a struct with the model properties

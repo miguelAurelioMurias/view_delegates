@@ -3,3 +3,5 @@ Metrics/MethodLength:
 # Disable this, if we follow his advice we will f* the code :)
 Performance/RedundantBlockCall:
   Enabled: false
+AllCops:
+  TargetRubyVersion: 2.4.2

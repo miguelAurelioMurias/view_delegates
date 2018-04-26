@@ -28,6 +28,9 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
       expect(test_dummy.one_string).to eq(@property_a)
       expect(test_dummy.other_string).to eq(@property_b)
     end
+    it 'Should inherit properties' do
+      expect(BasicDelegate.properties).to eq(PolymorphicDelegate.properties)
+    end
   end
   describe 'render' do
     before do
