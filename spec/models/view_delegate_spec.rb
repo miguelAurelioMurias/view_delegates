@@ -17,6 +17,10 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
     it 'Should assign model properties to internal struct' do
       expect(@delegate.dummy.a).to eq(@dummy.a)
     end
+    it 'Should inherit' do
+      expect(BasicDelegate.ar_models).to include(:b)
+      expect(PolymorphicDelegate.ar_models).not_to include(:basic)
+    end
   end
   describe 'property' do
     class TestClass < ViewDelegates::ViewDelegate
@@ -30,6 +34,7 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
     end
     it 'Should inherit properties' do
       expect(BasicDelegate.properties).to eq(PolymorphicDelegate.properties)
+      expect(BasicDelegate.view_locals).to_not eq(PolymorphicDelegate.view_locals)
     end
   end
   describe 'render' do
@@ -89,6 +94,10 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
       @rendered = @delegate.render(:index)
       expect(@rendered).to match /array2 b/
       expect(@rendered).to match /array1 b/
+    end
+    it 'Should inherit models' do
+      expect(BasicDelegate.ar_models).to include(:polis)
+      expect(PolymorphicDelegate.ar_models).to_not include(:basics)
     end
   end
 end
