@@ -61,7 +61,7 @@ module ViewDelegates
 
     private
 
-    def model_to_struct model, struct
+    def model_to_struct(model, struct)
       initialize_hash = {}
       struct_members = struct.members
       struct_members.each do |k|
@@ -73,7 +73,7 @@ module ViewDelegates
     class << self
       # Override the new, we may need polymorphism
       # @param [Hash] args
-      def new *args
+      def new(*args)
         if @polymorph_function
           command = super(*args)
           klazz = command.instance_eval(&@polymorph_function)
@@ -161,7 +161,7 @@ module ViewDelegates
         end
       end
 
-      def model_array method, properties: []
+      def model_array(method, properties: [])
         attr_accessor method
         # Add the method name to the array of delegate models
         self.ar_models += [method]
