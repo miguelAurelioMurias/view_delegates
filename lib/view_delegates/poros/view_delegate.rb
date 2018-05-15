@@ -198,7 +198,7 @@ module ViewDelegates
                            else
                              Struct.new(*val.attributes.keys)
                            end
-          model_array.map! {|e| model_to_struct(e, model_delegate)}
+          model_array = model_array.map {|e| model_to_struct(e, model_delegate)}
           instance_variable_set(:"@#{method}", model_array)
         end
       end
