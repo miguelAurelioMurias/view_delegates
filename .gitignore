@@ -7,4 +7,7 @@ coverage/
 *.gem
 .yardoc/
 doc/
+/test/dummy/tmp
 Gemfile.lock
+*.log
+*.sqlite3
