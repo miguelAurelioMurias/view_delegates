@@ -8,11 +8,13 @@ module ViewDelegates
     class_attribute :view_locals
     class_attribute :ar_models
     class_attribute :properties
+    class_attribute :view_helpers
     # We need self, Ruby gets confused without the self and thinks of a local variable instead
     # of ivar
     self.view_locals = self.view_locals || []
     self.ar_models = self.ar_models || []
     self.properties = self.properties || []
+    self.view_helpers = self.view_helpers || []
     # View delegate cache system
     # @return [ViewDelegates::Cache]
     def self.delegate_cache
@@ -33,7 +35,9 @@ module ViewDelegates
         send("#{t}=", view_data[t]) if view_data[t]
       end
     end
-
+    def self.helpers_name
+      "#{to_s.gsub(/^.*::/, '')}".sub(/Delegate/, ''.freeze).concat('Helper').underscore
+    end
     # Renders as a string the view passed as params
     # @param [Symbol] view
     def render(view, local_params: {}, &block)
@@ -42,13 +46,28 @@ module ViewDelegates
         locals[method] = send(method)
       end
       self.ar_models = {}
+      self.view_helpers = {}
       self.class.ar_models&.each do |ar_model|
         ar_models[ar_model] = instance_variable_get(:"@#{ar_model}")
       end
       self.class.properties&.each do |property|
         locals[property] = instance_variable_get "@#{property}"
       end
+      module_helpers = self.class.view_helpers
+      module_methods = {}
+      for method in module_helpers
+        module_methods[method] = method(method)
+      end
+      helper_obj = Struct.new(self.class.helpers_name.camelcase) do
+
+        module_helpers.each do |view_helper|
+          define_method view_helper do |*args|
+            module_methods[view_helper].call(*args)
+          end
+        end
+      end.new
       locals = locals.merge(ar_models).merge(local_params)
+      locals[self.class.helpers_name.to_sym] = helper_obj
       result = ViewDelegateController.render(self.class.view_path + '/' + view.to_s,
                                              locals: locals)
 
@@ -121,6 +140,12 @@ module ViewDelegates
       # @param [Symbol] method
       def view_local(*methods)
         self.view_locals += methods
+      end
+
+      # Marks a method as view helper
+      # @param [Array(Symbol)] methods
+      def helper(*methods)
+        self.view_helpers += methods
       end
 
       # View properties
