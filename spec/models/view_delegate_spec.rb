@@ -7,7 +7,13 @@ RSpec.describe ViewDelegates::ViewDelegate, type: :model do
     @property_b = 'Other ruby string'
     @dummy = DummyModel.new(a: 'property a', b: ' Property b')
     @dummies = [DummyModel.new(a: 'array1 a', b: 'array1 b'), DummyModel.new(a: 'array2 a', b: 'array2 b')]
-    @delegate = Admin::AdminTestDelegate.new(dummy: @dummy, my_property: 'My property test', dummies: @dummies)
+    @delegate = Admin::AdminTestDelegate.new(dummy: @dummy, my_property: 'My property test', dummies: @dummies, name: 'Miguel')
+  end
+  describe 'helper' do
+    it 'Should render helpers' do
+      render = @delegate.render(:index)
+      expect(render).to match /My name is Miguel/
+    end
   end
   describe 'model' do
     it 'Should assign objects' do
