@@ -120,7 +120,6 @@ module ViewDelegates
       # Marks a method as a view local
       # @param [Symbol] method
       def view_local(*methods)
-        self.view_locals = [] if view_locals.nil?
         self.view_locals += methods
       end
 
