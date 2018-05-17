@@ -133,7 +133,7 @@ module ViewDelegates
 
       # Gets the path for the delegate views
       def view_path
-        @view_path ||= to_s.sub(/Delegate/, ''.freeze).underscore
+        @view_path ||= to_s.sub(/Delegate$/, ''.freeze).underscore
       end
 
       # Marks a method as a view local
