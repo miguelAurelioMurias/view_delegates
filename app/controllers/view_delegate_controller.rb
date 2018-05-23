@@ -5,12 +5,10 @@ class ViewDelegateController < ActionController::Base
     ActionController::ConditionalGet,
     ActionController::EtagWithTemplateDigest,
     ActionController::EtagWithFlash,
-    ActionController::Caching,
     ActionController::ImplicitRender,
     ActionController::StrongParameters,
     ActionController::ParameterEncoding,
-    ActionController::Flash,
-    ActionController::FormBuilder
+    ActionController::Flash
   ].freeze
   without_modules MODULES
 end
