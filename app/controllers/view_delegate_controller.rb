@@ -9,7 +9,6 @@ class ViewDelegateController < ActionController::Base
     ActionController::ImplicitRender,
     ActionController::StrongParameters,
     ActionController::ParameterEncoding,
-    ActionController::Cookies,
     ActionController::Flash,
     ActionController::FormBuilder
   ].freeze
